@@ -1,0 +1,1 @@
+# me2u a nextjs chat application featuring auto-responding AI
