@@ -98,13 +98,15 @@ const chats = [
 const ChatContainer: React.FC = () => {
   return (
     <div className="flex flex-col items-start gap-4 mt-4 sm:w-full md:w-1/3 lg:w-1/4">
-      {chats.map((chat) => (
+      {chats.map((chat,id) => (
         <ChatItem
+        key={id.toString()}
           name={chat.name}
           lastChat={chat.lastChat}
           unreadChatsCount={chat.unreadChatsCount}
           time={chat.time}
           imageLink={chat.imageLink}
+        
         />
       ))}
     </div>

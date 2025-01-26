@@ -1,5 +1,6 @@
 import { Badge, Typography } from "@mui/material";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 interface chatProps {
@@ -16,8 +17,10 @@ const ChatItem: React.FC<chatProps> = ({
   time,
   unreadChatsCount,
 }) => {
+  
   return (
-    <div className="flex items-center justify-between py-2 w-full">
+    <Link className="flex items-center justify-between py-2 w-full hover:animate-pulse hover:border-2 p-2 border-gray-300 rounded-md" href={'/ChatPage'}
+     >
       {/* Profile Image */}
       <div className="w-1/4">
         <Image
@@ -50,8 +53,7 @@ const ChatItem: React.FC<chatProps> = ({
           />
         )}
       </div>
-        
-    </div>
+    </Link>
   );
 };
 

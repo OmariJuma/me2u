@@ -9,8 +9,8 @@ const Status: React.FC<statusProps>=({name, link})=> {
   return (
     <div className="flex content-center justify-center flex-col">
       <Image
-        width={100}
-        height={120}
+        width={60}
+        height={60}
         src={link}
         alt={name}
         className="rounded-full"
