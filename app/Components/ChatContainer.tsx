@@ -3,7 +3,16 @@ import React from "react";
 import ChatItem from "./ChatItem";
 import { Container } from "@mui/material";
 
-const chats = [
+interface messageType{
+  id: string;
+  from: string;
+  to: string;
+  message: string;
+  isRead: boolean;
+  sentAt: Date;
+}
+
+export const chats = [
   {
     imageLink: "https://avatar.iran.liara.run/public/1",
     name: "Alice",

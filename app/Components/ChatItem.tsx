@@ -1,6 +1,7 @@
+// app/Components/ChatItem.tsx
+import { useIsVisibleStore } from "@/utils/store";
 import { Badge, Typography } from "@mui/material";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 
 interface chatProps {
@@ -10,6 +11,7 @@ interface chatProps {
   time: string;
   unreadChatsCount: number;
 }
+
 const ChatItem: React.FC<chatProps> = ({
   imageLink,
   name,
@@ -17,19 +19,25 @@ const ChatItem: React.FC<chatProps> = ({
   time,
   unreadChatsCount,
 }) => {
-  
+  const updateIsVisible = useIsVisibleStore((state) => state.updateIsVisible);
+  const updateChatData = useIsVisibleStore((state) => state.updateChatData);
   return (
-    <Link className="flex items-center justify-between py-2 w-full hover:animate-pulse hover:border-2 p-2 border-gray-300 rounded-md" href={'/ChatPage'}
-     >
+    <div
+      className="flex items-center justify-between py-2 w-full hover:animate-pulse hover:border-2 p-2 border-gray-300 rounded-md"
+      onClick={() => {
+        updateIsVisible(true);
+        updateChatData({
+          imageLink,
+          name,
+          lastChat,
+          time,
+          unreadChatsCount,
+        });
+      }}
+    >
       {/* Profile Image */}
       <div className="w-1/4">
-        <Image
-          width={60}
-          height={60}
-          src={imageLink}
-          alt={name}
-          className="rounded-full"
-        />
+        <Image width={60} height={60} src={imageLink} alt={name} className="rounded-full" />
       </div>
       {/* Chat Details */}
       <div className="w-1/2 overflow-ellipsis ml-1">
@@ -46,14 +54,10 @@ const ChatItem: React.FC<chatProps> = ({
           {time}
         </Typography>
         {unreadChatsCount > 0 && (
-          <Badge
-            badgeContent={unreadChatsCount}
-            color="info"
-            className="mt-1"
-          />
+          <Badge badgeContent={unreadChatsCount} color="info" className="mt-1" />
         )}
       </div>
-    </Link>
+    </div>
   );
 };
 
