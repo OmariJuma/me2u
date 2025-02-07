@@ -104,7 +104,14 @@ export const chats = [
     to: "Ivan",
   },
 ];
+const getdata = async()=>{
+  const response = await fetch("/api/chats");
+return response.json();
+}
 const ChatContainer: React.FC = () => {
+  
+  const response = getdata();
+ response.then(res=>console.log(res));
   return (
     <div className="flex flex-col items-start gap-4 mt-4 sm:w-full md:w-1/3 lg:w-1/4">
       {chats.map((chat,id) => (

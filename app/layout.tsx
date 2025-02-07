@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppBar, Container, Toolbar, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-
+import connectToDb from "@/utils/connectToDb";
+import { ToastContainer } from "react-toastify";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,11 +25,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+  connectToDb()
+    return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ToastContainer/>
         <AppBar
           position="sticky"
           style={{
