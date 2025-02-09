@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
-interface ChatMessage{
-    from: string;
-    to:string;
-    message: string;
-    time: string;
+interface ChatMessage {
+  from: string;
+  to: string;
+  message: string;
+  time: string;
 }
 interface ChatState {
   isVisible: boolean;
@@ -36,6 +36,14 @@ export const useIsVisibleStore = create<ChatState & Action>((set) => ({
   },
   updateIsVisible: (isVisible) => set(() => ({ isVisible: isVisible })),
   updateChatData: (chatData) => set(() => ({ chatData: chatData })),
-  messages:[],
-  addMessage:(message)=>set((state)=>({messages:[...state.messages, message]}))
+  messages: [],
+  addMessage: (message) =>
+    set((state) => ({ messages: [...state.messages, message] })),
 }));
+
+type userState = {
+  userInfo: { id: string; name: string; profilePicUrl: string };
+};
+type userAction = {
+  loggedIn: (userState);
+};

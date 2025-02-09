@@ -1,130 +1,92 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ChatItem from "./ChatItem";
-import { Container } from "@mui/material";
 
-interface messageType{
-  id: string;
-  from: string;
-  to: string;
-  message: string;
-  isRead: boolean;
-  sentAt: Date;
-}
+export type Chat = {
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: string; // Changed to string for easy sorting
+  status: "sent" | "delivered" | "read";
+};
 
-export const chats = [
-  {
-    imageLink: "https://avatar.iran.liara.run/public/1",
-    name: "Alice",
-    lastChat: "Hey, how are you?",
-    time: "10:30 AM",
-    unreadChatsCount: 2,
-    from: "Alice",
-    to: "Bob",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/2",
-    name: "Bob",
-    lastChat: "I'm good, thanks!",
-    time: "10:32 AM",
-    unreadChatsCount: 0,
-    from: "Bob",
-    to: "Alice",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/3",
-    name: "Charlie",
-    lastChat: "Are we still on for tonight?",
-    time: "9:15 AM",
-    unreadChatsCount: 1,
-    from: "Charlie",
-    to: "David",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/4",
-    name: "David",
-    lastChat: "Yes, see you at 8!",
-    time: "9:17 AM",
-    unreadChatsCount: 0,
-    from: "David",
-    to: "Charlie",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/5",
-    name: "Eve",
-    lastChat: "Can you send me the report?",
-    time: "8:45 AM",
-    unreadChatsCount: 3,
-    from: "Eve",
-    to: "Frank",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/6",
-    name: "Frank",
-    lastChat: "Sure, give me a minute.",
-    time: "8:50 AM",
-    unreadChatsCount: 0,
-    from: "Frank",
-    to: "Eve",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/7",
-    name: "Grace",
-    lastChat: "Happy Birthday!",
-    time: "7:30 AM",
-    unreadChatsCount: 5,
-    from: "Grace",
-    to: "Heidi",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/8",
-    name: "Heidi",
-    lastChat: "Thank you!",
-    time: "7:35 AM",
-    unreadChatsCount: 0,
-    from: "Heidi",
-    to: "Grace",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/9",
-    name: "Ivan",
-    lastChat: "Let's catch up soon.",
-    time: "6:00 AM",
-    unreadChatsCount: 1,
-    from: "Ivan",
-    to: "Judy",
-  },
-  {
-    imageLink: "https://avatar.iran.liara.run/public/10",
-    name: "Judy",
-    lastChat: "Absolutely!",
-    time: "6:05 AM",
-    unreadChatsCount: 0,
-    from: "Judy",
-    to: "Ivan",
-  },
-];
-const getdata = async()=>{
-  const response = await fetch("/api/chats");
-return response.json();
-}
+export type User = {
+  _id: string;
+  name: string;
+  profilePicUrl: string;
+};
+
 const ChatContainer: React.FC = () => {
-  
-  const response = getdata();
- response.then(res=>console.log(res));
+  const [chatData, setChatData] = useState<Chat[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const currentUser = "67a678e6d74d084b48b2b0a2"; // Replace with actual user ID
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [chatRes, userRes] = await Promise.all([
+          fetch("/api/chats"),
+          fetch("/api/users"),
+        ]);
+
+        const chatData: Chat[] = await chatRes.json();
+        const usersData: User[] = await userRes.json();
+
+        setChatData(chatData);
+        setUsers(usersData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Extract unique user IDs from chatData (excluding currentUser)
+  const uniqueUserIds = new Set(
+    chatData.flatMap(({ senderId, receiverId }) =>
+      [senderId, receiverId].filter((id) => id !== currentUser)
+    )
+  );
+
+  // Get user objects based on unique IDs
+  const uniqueUsers = users.filter((user) => uniqueUserIds.has(user._id));
+
+  // Function to get the last message exchanged with a user
+  const getLastMessage = (userId: string) => {
+    const messages = chatData
+      .filter(
+        (chat) =>
+          (chat.senderId === currentUser && chat.receiverId === userId) ||
+          (chat.senderId === userId && chat.receiverId === currentUser)
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      ); // Sort descending
+
+    return messages.length > 0 ? messages[0] : null;
+  };
+
   return (
-    <div className="flex flex-col items-start gap-4 mt-4 sm:w-full md:w-1/3 lg:w-1/4">
-      {chats.map((chat,id) => (
-        <ChatItem
-        key={id.toString()}
-          name={chat.name}
-          lastChat={chat.lastChat}
-          unreadChatsCount={chat.unreadChatsCount}
-          time={chat.time}
-          imageLink={chat.imageLink}
-        
-        />
-      ))}
+    <div className="flex flex-col items-start gap-4 mt-4 sm:w-full md:w-1/3 lg:w-1/4 overflow-y-auto h-full">
+      {uniqueUsers.map((user) => {
+        const lastMessage = getLastMessage(user._id);
+        return (
+          <ChatItem
+            key={user._id}
+            name={user.name}
+            lastChat={lastMessage ? lastMessage.content : "No messages yet"}
+            unreadChatsCount={0} // You can replace this with actual unread message count logic
+            time={
+              lastMessage
+                ? new Date(lastMessage.timestamp).toLocaleTimeString()
+                : ""
+            }
+            imageLink={user.profilePicUrl || ""}
+          />
+        );
+      })}
     </div>
   );
 };

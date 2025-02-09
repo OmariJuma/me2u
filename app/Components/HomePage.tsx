@@ -7,6 +7,7 @@ import { useIsVisibleStore } from "@/utils/store";
 import StatusContainer from "./StatusContainer";
 import ChatContainer from "./ChatContainer";
 import ChatMessages from "./ChatMessages";
+import ChatInput from "./ChatInput";
 
 export default function HomePage() {
   const [isSmall, setIsSmall] = useState(false);
@@ -36,11 +37,15 @@ export default function HomePage() {
         </Typography>
         <FilterList />
       </div>
-      <div className={`${!isSmall && "flex flex-row gap-3"}`}>
+      <div className={`${!isSmall && "flex flex-row gap-3 h-[80vh]"}`}>
+        {/* Left Chat List Panel */}
         <ChatContainer />
+
+        {/* Right Chat Messages Panel */}
         {!isSmall && isVisible && (
-          <div className="md:w-2/3 lg:w-3/4">
+          <div className="md:w-2/3 lg:w-3/4 overflow-y-auto h-full">
             <ChatMessages />
+            <ChatInput senderId="67a678e6d74d084b48b2b0a2" receiverId="67a67a81d74d084b48b2b0aa"/>
           </div>
         )}
       </div>

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppBar, Container, Toolbar, Typography } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import connectToDb from "@/utils/connectToDb";
 import { ToastContainer } from "react-toastify";
 const geistSans = Geist({
@@ -25,38 +23,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  connectToDb()
-    return (
+  connectToDb();
+  return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ToastContainer/>
-        <AppBar
-          position="sticky"
-          style={{
-            backgroundColor: "var(--background)",
-            color: "var(--foreground)'",
-          }}
-        >
-          <Container maxWidth="xl">
-            <Toolbar
-              disableGutters
-              className="flex flex-row justify-between sm:w-full md:w-1/3 lg:w-1/4"
-            >
-              <Typography
-                variant="h4"
-                component={"a"}
-                className="ml-2 text-md"
-                href="#"
-              >
-                Me2u
-              </Typography>
+        <ToastContainer />
 
-              <SearchIcon color="primary" fontSize="large" />
-            </Toolbar>
-          </Container>
-        </AppBar>
         {children}
       </body>
     </html>

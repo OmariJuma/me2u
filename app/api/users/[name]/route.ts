@@ -30,7 +30,7 @@ export async function POST(
     }
     const { name, _id, profilePicUrl } = foundUser;
     const response = NextResponse.json(
-      { _id, name, profilePicUrl },
+      { id:_id, name, profilePicUrl },
       { status: 200 }
     );
     response.cookies.set("uName", name, {

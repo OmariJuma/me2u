@@ -21,6 +21,11 @@ const ChatItem: React.FC<chatProps> = ({
 }) => {
   const updateIsVisible = useIsVisibleStore((state) => state.updateIsVisible);
   const updateChatData = useIsVisibleStore((state) => state.updateChatData);
+  // console.log(imageLink,
+  //   name,
+  //   lastChat,
+  //   time,
+  //   unreadChatsCount,)
   return (
     <div
       className="flex items-center justify-between py-2 w-full hover:animate-pulse hover:border-2 p-2 border-gray-300 rounded-md"
