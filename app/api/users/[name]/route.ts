@@ -37,6 +37,10 @@ export async function POST(
       maxAge: 7 * 24 * 60 * 60,
       sameSite: "strict",
     });
+    response.cookies.set("id", _id,{
+      maxAge: 7*24*60*60,
+      sameSite:"strict"
+    })
     return response;
   } catch (error) {
     return NextResponse.json(

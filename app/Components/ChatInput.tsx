@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { ref, push, set, database } from "@/utils/firebase";
 
 interface ChatInputProps {
   senderId: string;
@@ -11,33 +12,19 @@ const ChatInput: React.FC<ChatInputProps> = ({ senderId, receiverId }) => {
   const [message, setMessage] = useState("");
 
   const sendMessage = async () => {
-    if (!message.trim()) return; // Prevent sending empty messages
+    if (!message.trim()) return;
 
-    const chatBody = {
+    const chatRef = ref(database, "chats");
+
+    // Push new message to Firebase
+    push(chatRef, {
       senderId,
       receiverId,
       content: message,
-      messageType: "text",
-      status: "sent",
-    };
+      timestamp: new Date().toISOString(),
+    });
 
-    try {
-      const response = await fetch("/api/chats", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(chatBody),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
-
-      setMessage(""); // Clear input after successful send
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    setMessage(""); // Clear input field
   };
 
   return (
@@ -52,7 +39,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ senderId, receiverId }) => {
       <button
         onClick={sendMessage}
         disabled={!message.trim()}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-600 "
+        className="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-600"
       >
         Send
       </button>

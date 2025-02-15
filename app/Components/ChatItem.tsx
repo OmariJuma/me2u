@@ -1,10 +1,10 @@
 // app/Components/ChatItem.tsx
-import { useIsVisibleStore } from "@/utils/store";
+import { useIsVisibleStore, useUserStore } from "@/utils/store";
 import { Badge, Typography } from "@mui/material";
 import Image from "next/image";
-import React from "react";
 
 interface chatProps {
+  id: string;
   imageLink: string;
   name: string;
   lastChat: string;
@@ -13,6 +13,7 @@ interface chatProps {
 }
 
 const ChatItem: React.FC<chatProps> = ({
+  id,
   imageLink,
   name,
   lastChat,
@@ -20,24 +21,15 @@ const ChatItem: React.FC<chatProps> = ({
   unreadChatsCount,
 }) => {
   const updateIsVisible = useIsVisibleStore((state) => state.updateIsVisible);
-  const updateChatData = useIsVisibleStore((state) => state.updateChatData);
-  // console.log(imageLink,
-  //   name,
-  //   lastChat,
-  //   time,
-  //   unreadChatsCount,)
+  const setReceiverId = useUserStore((state) => state.setReceiverId);
+  
+  
   return (
     <div
       className="flex items-center justify-between py-2 w-full hover:animate-pulse hover:border-2 p-2 border-gray-300 rounded-md"
       onClick={() => {
+        setReceiverId(id);
         updateIsVisible(true);
-        updateChatData({
-          imageLink,
-          name,
-          lastChat,
-          time,
-          unreadChatsCount,
-        });
       }}
     >
       {/* Profile Image */}

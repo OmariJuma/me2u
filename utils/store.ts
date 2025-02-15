@@ -43,7 +43,16 @@ export const useIsVisibleStore = create<ChatState & Action>((set) => ({
 
 type userState = {
   userInfo: { id: string; name: string; profilePicUrl: string };
+  receiverId: string
 };
 type userAction = {
-  loggedIn: (userState);
+  setUserInfo: (userState: userState["userInfo"]) => void;
+  setReceiverId: (receiverId: string) => void;
 };
+
+export const useUserStore = create<userState & userAction>((set) => ({
+  userInfo: { id: "", name: "", profilePicUrl: "" },
+  setUserInfo: (userInfo) => set(() => ({ userInfo: userInfo })),
+  receiverId: "",
+  setReceiverId: (receiverId) => set(() => ({ receiverId: receiverId}))
+}));

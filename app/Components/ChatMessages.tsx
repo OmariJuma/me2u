@@ -2,41 +2,79 @@
 
 import React, { useEffect, useState } from "react";
 import { Typography } from "@mui/material";
-import { Chat } from "./ChatContainer";
+import { useUserStore } from "@/utils/store";
+import { database, ref, onValue } from "@/utils/firebase";
+
+interface Chat {
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: string;
+}
 
 const ChatMessages: React.FC = () => {
   const [chatData, setChatData] = useState<Chat[]>([]);
-  const currentUser = "67a678e6d74d084b48b2b0a2"; // Replace with actual user ID
+  const { id: userId } = useUserStore((state) => state.userInfo);
+  const receiverId = useUserStore((state) => state.receiverId);
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await fetch("/api/chats");
-        if (!response.ok) throw new Error("Failed to fetch chats");
-        const data: Chat[] = await response.json();
-        setChatData(data);
-      } catch (error) {
-        console.error("Error fetching chat messages:", error);
-      }
-    };
+    if (!userId || !receiverId) return; // ✅ Prevent running with undefined values
 
-    fetchMessages();
-  }, []);
+    console.log("🔥 Fetching messages for conversation between:", userId, receiverId);
+
+    const chatRef = ref(database, "chats");
+
+    // ✅ Listen for real-time updates
+    const unsubscribe = onValue(chatRef, (snapshot) => {
+      const data = snapshot.val();
+
+      if (!data) {
+        console.warn("⚠️ No chat messages found in Firebase.");
+        setChatData([]);
+        return;
+      }
+
+      const messages: Chat[] = Object.values(data);
+
+      console.log("📩 All Messages from Firebase:", messages);
+
+      // ✅ Filter messages correctly
+      const filteredMessages = messages.filter(
+        (msg) =>
+          (msg.senderId === userId && msg.receiverId === receiverId) ||
+          (msg.senderId === receiverId && msg.receiverId === userId)
+      );
+
+      console.log("✅ Filtered Messages:", filteredMessages);
+      setChatData(filteredMessages);
+    });
+
+    return () => unsubscribe(); // ✅ Cleanup listener when component unmounts
+  }, [userId, receiverId]);
 
   return (
-    <div className="flex flex-col gap-2 p-4">
-      {chatData
-        .filter((msg) => msg.senderId === currentUser || msg.receiverId === currentUser)
-        .map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${msg.senderId === currentUser ? "justify-end" : "justify-start"}`}
+    <div className="flex flex-col gap-2 p-4 mb-10">
+      {chatData.length === 0 && (
+        <p className="text-gray-500 text-center">No messages yet...</p>
+      )}
+
+      {chatData.map((msg, index) => (
+        <div
+          key={index}
+          className={`flex ${
+            msg.senderId === userId ? "justify-end" : "justify-start"
+          }`}
+        >
+          <Typography
+            variant="body2"
+            className={`border-2 p-2 rounded-md ${
+              msg.senderId === userId ? "bg-blue-400 text-white" : "bg-gray-300 text-black"
+            }`}
           >
-            <Typography variant="body2" className="border-2 border-blue-400 p-2 rounded-md">
-              {msg.content}
-            </Typography>
-          </div>
-        ))}
+            {msg.content}
+          </Typography>
+        </div>
+      ))}
     </div>
   );
 };

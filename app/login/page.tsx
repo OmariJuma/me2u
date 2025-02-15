@@ -1,4 +1,5 @@
 "use client";
+import { useUserStore } from "@/utils/store";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
@@ -6,6 +7,8 @@ import { toast } from "react-toastify";
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const userInfo = useUserStore((state)=>state.setUserInfo);
+
   const router = useRouter();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +26,11 @@ function Login() {
     if (!response.ok) {
       return toast.error(await response.json());
     }
-    const { name, _id, profilePicUrl } = await response.json();
+    const { name, id, profilePicUrl } = await response.json();
+   console.log(name, id, profilePicUrl);
+    userInfo({ id: id, name, profilePicUrl });
+
+    
     toast(`Welcome ${name}`);
     router.push("/")
   };
